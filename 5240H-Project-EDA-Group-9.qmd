@@ -1,0 +1,211 @@
+---
+format:
+  pdf:
+    keep-tex: true
+    titlepage: true
+    include-in-header: 
+       text: |
+         \usepackage{fvextra}
+         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+bibliography: references.bib
+csl: ieee.csl
+link-citations: true
+include-before-body:
+  text: |
+    \RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+      showspaces = false,
+      showtabs = false,
+      breaksymbolleft={},
+      breaklines
+      % Note: setting commandchars=\\\{\} here will cause an error 
+    }
+header-includes: |
+  \AtBeginDocument{
+    \title{
+      Exploratory Data Analysis (Holiday Movies)
+    }
+    \author{
+      Md Nazmul Hossain (0843082) \\ 
+      A A Talha Talukder (XXXXXXX) \\ 
+      Nibedita Mallik (XXXXXXX)
+    }
+    <!-- \date{ -->
+    <!--   \today -->
+    <!-- } -->
+    \maketitle
+    \begin{center}
+      \large{\textbf{Group number: 09}}  \\
+      \large{\textbf{Project ID: 07}} 
+    \end{center}
+  }
+  \usepackage{listings}
+  \lstset{
+    breaklines=true,
+    breakatwhitespace=true,
+    basicstyle=\ttfamily\footnotesize,
+    frame=single
+  }
+  \usepackage{ragged2e}
+  \justifying
+  \usepackage{booktabs}
+  \usepackage{longtable}
+  \usepackage{array}
+  \usepackage{graphicx}
+  \usepackage{float}
+  \floatplacement{table}{H}
+  \floatplacement{figure}{H}
+  \usepackage{caption}
+  \captionsetup[table]{skip=10pt}
+editor: visual
+output: 
+  pdf: 
+    documentclass: article
+    titlepage: true
+  html: 
+    toc: true
+  word: default
+appendix: true
+execute:
+  comment: false
+---
+
+\newpage
+
+```{r}
+#| echo: false
+#| label: load libraries
+#| message: false
+#| warning: false
+
+# Some global settings, data preparation and variables to ease the usage of different variables 
+# without worrying to create or load in multiple places
+
+# load tidyverse
+library(tidyverse)
+# load kableExtra
+library(kableExtra)
+
+# read data from github
+holiday_movies <- readr::read_csv('holiday_movies.csv')
+holiday_movie_genres <- readr::read_csv('holiday_movie_genres.csv')
+
+# create a data frame where every genre name is a column
+# and each will have value 0 or 1. Value 1 means it beolngs to that genre, 0 means doesnt belongs to that
+holiday_movies_ext <- holiday_movies %>%
+  mutate(copy_genres = genres) %>%  # keep the original genres column intact
+  separate_rows(copy_genres, sep = ",") %>%  # split genres into separate rows
+  mutate(dummy = 1) %>%  # create a dummy variable for each genre
+  pivot_wider(names_from = copy_genres, values_from = dummy, values_fill = 0)  # pivot to wide format, fill with 0
+
+# view the resulting data frame
+# head(holiday_movies_ext)
+
+# set theme
+theme_set(theme_bw()) 
+```
+
+# Introduction
+
+Movie data introduction and the citation style we are going to use is IEEE [@HeQiang2022ASPB]. The tidytuesday reference is here [@tidytuesday].
+
+# Data Collection
+
+We have collected the data from tidytuesday [@tidytuesday].
+
+The data we have collected is showing as below in @tbl-top-ten-genres-by-movie-count.
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-top-ten-genres-by-movie-count
+#| tbl-cap: "Top 10 renres by number of movies."
+
+# get top 10 genres by movie count
+top_10_gnr_mv_count <- holiday_movies %>%
+  separate_rows(genres, sep = ",") %>%
+  group_by(genres) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  head(10)
+
+# display the table
+kable(top_10_gnr_mv_count, format = "latex", booktabs = TRUE)
+```
+
+# Data Summaries
+
+We are going to split this section into two sub-sections, as with numerical and graphical summaries.
+
+## Nemerical Summaries
+
+The total number of observations from the survey received is: `r nrow(holiday_movies)`. The table shows in @tbl-top-ten-genres-by-movie-count.
+
+## Graphical Summaries
+
+We will take help of several graphical plots here to describe the data. Listed as below.
+
+### Box Plot
+
+Box plot details will go here ...
+
+### Bar Plot
+
+Bar plot details will go here and sample with caption as below  @fig-top-ten-genres-by-movie-count.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-top-ten-genres-by-movie-count
+#| fig-cap: "Top 10 genres by number of movies."
+#| fig-height: 6
+#| fig-width: 8
+#| fig-align: center
+
+# display the bar plot
+ggplot(top_10_gnr_mv_count, aes(x = reorder(genres, -Count), y = Count, fill = genres)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Genres", y = "Count")
+```
+
+
+### Linear Regression (e.g. with Scatter Plot)
+
+Linear regression details.
+
+# Discussion
+
+The discussion details.
+
+# Correlations (if applicable)
+
+Correlation details.
+
+# Conclusion
+
+Here goes the conclusion section!
+
+\newpage
+
+# References
+
+::: {#refs}
+::: 
+
+# Acknowledgements
+
+- We would like to give thanks to the tidytuesday for the relevant data.
+- Additionally, we would took help to debug tables, plot and data transformation codes in Stack overflow code snippets and Copilot.
+
+\newpage
+
+# Appendix
+
+## Code
+
+```{r}
+#| echo: true 
+#| eval: false 
+#| ref-label: !expr knitr::all_labels()
+```
+
