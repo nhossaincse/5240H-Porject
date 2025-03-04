@@ -25,9 +25,7 @@ header-includes: |
       Exploratory Data Analysis (Holiday Movies)
     }
     \author{
-      Md Nazmul Hossain (0843082) \\ 
-      A A Talha Talukder (XXXXXXX) \\ 
-      Nibedita Mallik (XXXXXXX)
+      Md Nazmul Hossain
     }
     <!-- \date{ -->
     <!--   \today -->
